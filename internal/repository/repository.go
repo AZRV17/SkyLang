@@ -16,6 +16,7 @@ type Users interface {
 	UpdatePassword(id int, password string) (*domain.User, error)
 	SignUpForCourse(userID, courseID int) error
 	UpdatePasswordByEmail(email, password string) (*domain.User, error)
+	SetUserAvatar(id int, avatar string) (*domain.User, error)
 }
 
 type Courses interface {
@@ -30,6 +31,7 @@ type Courses interface {
 	SortCourseByTitle() ([]domain.Course, error)
 	SortCourseByDate() ([]domain.Course, error)
 	SortCourseByRating() ([]domain.Course, error)
+	SetCourseIcon(id int, icon string) error
 }
 
 type Lectures interface {

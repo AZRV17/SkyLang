@@ -15,6 +15,7 @@ func (h *Handler) initCourseRoutes(r *gin.Engine) {
 		courses.GET("/:id", h.getCourseById)
 		courses.PUT("/:id", h.updateCourse)
 		courses.DELETE("/:id", h.deleteCourse)
+		courses.PUT("/:id/updateIcon", h.updateIcon)
 	}
 }
 
@@ -142,4 +143,30 @@ func (h *Handler) sortCourseByTitle(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, courses)
+}
+
+type updateIconInput struct {
+	Icon string `json:"icon"`
+}
+
+func (h *Handler) updateIcon(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var input updateIconInput
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = h.service.ImageService.SetCourseImage(id, input.Icon)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Icon updated"})
 }

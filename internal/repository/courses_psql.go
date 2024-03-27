@@ -216,3 +216,19 @@ func (c CourseRepository) SortCourseByRating() ([]domain.Course, error) {
 
 	return courses, nil
 }
+
+func (c CourseRepository) SetCourseIcon(id int, icon string) error {
+	tx := c.db.Begin()
+
+	if err := tx.Model(&domain.Course{}).Where("id = ?", id).Update("icon", icon).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}

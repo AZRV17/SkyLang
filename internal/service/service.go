@@ -141,6 +141,11 @@ type Email interface {
 	SendMailForPasswordReset(recipient string, resetCode int) error
 }
 
+type Image interface {
+	SetCourseImage(id int, image string) error
+	SetUserAvatar(id int, avatar string) error
+}
+
 type Service struct {
 	repository      repository.Repository
 	UserService     Users
@@ -149,6 +154,7 @@ type Service struct {
 	ExerciseService Exercises
 	CommentService  Comments
 	EmailService    Email
+	ImageService    Image
 }
 
 func NewService(
@@ -165,5 +171,6 @@ func NewService(
 		ExerciseService: NewExerciseService(repository.Exercises),
 		CommentService:  NewCommentService(repository.Comments),
 		EmailService:    emailService,
+		ImageService:    NewImageService(repository.Users, repository.Courses),
 	}
 }

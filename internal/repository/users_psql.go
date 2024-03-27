@@ -204,3 +204,26 @@ func (u UserRepository) UpdatePasswordByEmail(email, password string) (*domain.U
 
 	return &user, nil
 }
+
+func (u UserRepository) SetUserAvatar(id int, avatar string) (*domain.User, error) {
+	tx := u.db.Begin()
+
+	if err := tx.Model(&domain.User{}).Where("id = ?", id).Update("avatar", avatar).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	var user domain.User
+
+	if err := tx.First(&user, "id = ?", id).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	return &user, nil
+}
