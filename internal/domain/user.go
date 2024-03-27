@@ -11,6 +11,7 @@ type User struct {
 	Password  string    `json:"password"`
 	Email     string    `json:"email"`
 	Role      string    `json:"role"`
+	Avatar    string    `json:"avatar" gorm:"null"`
 	Courses   []Course  `json:"courses" gorm:"many2many:user_courses"`
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
