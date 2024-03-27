@@ -4,6 +4,7 @@ import (
 	"github.com/AZRV17/Skylang/internal/config"
 	"github.com/AZRV17/Skylang/internal/domain"
 	"github.com/AZRV17/Skylang/internal/repository"
+	"os"
 )
 
 type CreateUserInput struct {
@@ -144,6 +145,7 @@ type Email interface {
 type Image interface {
 	SetCourseImage(id int, image string) error
 	SetUserAvatar(id int, avatar string) error
+	GetUserAvatar(id int) (os.File, error)
 }
 
 type Service struct {

@@ -97,6 +97,17 @@ func (i ImageService) SetUserAvatar(id int, avatar string) error {
 	return err
 }
 
+func (i ImageService) GetUserAvatar(id int) (os.File, error) {
+	user, err := i.userRepo.GetUserByID(id)
+	if err != nil {
+		return os.File{}, err
+	}
+
+	img, err := os.Open(user.Avatar)
+
+	return *img, err
+}
+
 func saveImage(resizedImg image.Image, originalFormat string, outputPath string) error {
 	outFile, err := os.Create(outputPath)
 	if err != nil {

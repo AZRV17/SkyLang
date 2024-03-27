@@ -23,6 +23,7 @@ func (h *Handler) initUserRoutes(r *gin.Engine) {
 		users.PUT("/resetPassword", h.resetPassword)
 		users.PUT("/updatePasswordByEmail", h.updatePasswordByEmail)
 		users.PUT("/:id/updateAvatar", h.updateAvatar)
+		users.GET("/:id/avatar", h.getAvatar)
 	}
 }
 
@@ -284,4 +285,20 @@ func (h *Handler) updateAvatar(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Avatar updated"})
+}
+
+func (h *Handler) getAvatar(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	avatar, err := h.service.ImageService.GetUserAvatar(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.File(avatar.Name())
 }
