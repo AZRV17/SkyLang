@@ -4,15 +4,19 @@ import (
 	"github.com/AZRV17/Skylang/internal/domain"
 	"github.com/AZRV17/Skylang/internal/repository"
 	"golang.org/x/crypto/bcrypt"
+	"log"
+	"math/rand"
 )
 
 type UserService struct {
-	repository repository.Users
+	repository   repository.Users
+	emailService EmailService
 }
 
-func NewUserService(repository repository.Users) *UserService {
+func NewUserService(repository repository.Users, emailService EmailService) *UserService {
 	return &UserService{
-		repository: repository,
+		repository:   repository,
+		emailService: emailService,
 	}
 }
 
@@ -93,4 +97,25 @@ func (u UserService) DeleteUser(id int) error {
 
 func (u UserService) SignUpForCourse(userID, courseID int) error {
 	return u.repository.SignUpForCourse(userID, courseID)
+}
+
+func (u UserService) ResetPassword(email string) (int, error) {
+	resetCode := rand.Intn(10000-1000) + 1000
+
+	log.Println(resetCode)
+
+	if err := u.emailService.SendMailForPasswordReset(email, resetCode); err != nil {
+		return 0, err
+	}
+
+	return resetCode, nil
+}
+
+func (u UserService) UpdatePasswordByEmail(email, password string) (*domain.User, error) {
+	hashPass, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	return u.repository.UpdatePasswordByEmail(email, string(hashPass))
 }

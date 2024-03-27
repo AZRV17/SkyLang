@@ -25,6 +25,10 @@ func (u UserRepository) SignInByLogin(login, password string) (*domain.User, err
 		return nil, err
 	}
 
+	if err := user.CheckPassword(password); err != nil {
+		return nil, err
+	}
+
 	if err := tx.Commit().Error; err != nil {
 		tx.Rollback()
 		return nil, err
@@ -176,4 +180,27 @@ func (u UserRepository) SignUpForCourse(userID, courseID int) error {
 	}
 
 	return nil
+}
+
+func (u UserRepository) UpdatePasswordByEmail(email, password string) (*domain.User, error) {
+	tx := u.db.Begin()
+
+	if err := tx.Model(&domain.User{}).Where("email = ?", email).Update("password", password).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	var user domain.User
+
+	if err := tx.First(&user, "email = ?", email).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	return &user, nil
 }

@@ -20,6 +20,8 @@ func (h *Handler) initUserRoutes(r *gin.Engine) {
 		users.DELETE("/:id", h.deleteUser)
 		users.PUT("/:id/changePassword", h.updatePassword)
 		users.PUT("/:id/signUpForCourse", h.signUpForCourse)
+		users.PUT("/resetPassword", h.resetPassword)
+		users.PUT("/updatePasswordByEmail", h.updatePasswordByEmail)
 	}
 }
 
@@ -150,6 +152,12 @@ type UpdatePasswordInput struct {
 }
 
 func (h *Handler) updatePassword(c *gin.Context) {
+	cookie, err := c.Cookie("password_reset_allowed")
+	if err != nil || cookie != "true" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Password reset not allowed"})
+		return
+	}
+
 	var input UpdatePasswordInput
 	if err := c.BindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -161,6 +169,9 @@ func (h *Handler) updatePassword(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	// Удалить куки после обновления пароля
+	c.SetCookie("password_reset_allowed", "", -1, "/", "", false, true)
 
 	c.JSON(http.StatusOK, user)
 }
@@ -200,4 +211,49 @@ func (h *Handler) signUpForCourse(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "User signed up for course"})
+}
+
+type resetPasswordInput struct {
+	Email string `json:"email"`
+}
+
+func (h *Handler) resetPassword(c *gin.Context) {
+	var input resetPasswordInput
+
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	resetCode, err := h.service.UserService.ResetPassword(input.Email)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.SetCookie("password_reset_allowed", "true", 3600, "/", "", false, true)
+
+	c.JSON(http.StatusOK, gin.H{"reset_code": resetCode})
+}
+
+type updatePasswordByEmailInput struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+func (h *Handler) updatePasswordByEmail(c *gin.Context) {
+	var input updatePasswordByEmailInput
+
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	_, err := h.service.UserService.UpdatePasswordByEmail(input.Email, input.Password)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password updated"})
 }

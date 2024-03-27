@@ -34,7 +34,7 @@ func Run() {
 
 	repo := repository.NewRepository(psql.DB)
 
-	service := service.NewService(*repo)
+	service := service.NewService(*repo, *cfg)
 
 	h := httpHandelr.NewHandler(*service, cfg)
 

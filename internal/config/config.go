@@ -33,6 +33,13 @@ type Config struct {
 	Auth struct {
 		SecretKey string `yaml:"secret-key"`
 	}
+
+	Email struct {
+		Host     string `yaml:"host"`
+		Port     int    `yaml:"port"`
+		Username string `yaml:"username"`
+		Password string `yaml:"password"`
+	}
 }
 
 func NewConfig(configPath string) (*Config, error) {
@@ -59,6 +66,10 @@ func NewConfig(configPath string) (*Config, error) {
 	config.Redis.Password = viper.GetString("redis-dev.password")
 	config.Redis.Db = viper.GetInt("redis-dev.db")
 	config.Auth.SecretKey = viper.GetString("auth.secret-key")
+	config.Email.Host = viper.GetString("email.host")
+	config.Email.Port = viper.GetInt("email.port")
+	config.Email.Username = viper.GetString("email.username")
+	config.Email.Password = viper.GetString("email.password")
 
 	return config, nil
 }

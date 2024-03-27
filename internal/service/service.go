@@ -1,6 +1,7 @@
 package service
 
 import (
+	"github.com/AZRV17/Skylang/internal/config"
 	"github.com/AZRV17/Skylang/internal/domain"
 	"github.com/AZRV17/Skylang/internal/repository"
 )
@@ -30,6 +31,8 @@ type Users interface {
 	UpdatePassword(id int, password string) (*domain.User, error)
 	DeleteUser(id int) error
 	SignUpForCourse(userID, courseID int) error
+	ResetPassword(email string) (int, error)
+	UpdatePasswordByEmail(email, password string) (*domain.User, error)
 }
 
 type CreateCourseInput struct {
@@ -134,6 +137,10 @@ type Comments interface {
 	GetCommentsByCourseID(id int) ([]domain.Comment, error)
 }
 
+type Email interface {
+	SendMailForPasswordReset(recipient string, resetCode int) error
+}
+
 type Service struct {
 	repository      repository.Repository
 	UserService     Users
@@ -141,17 +148,22 @@ type Service struct {
 	LectureService  Lectures
 	ExerciseService Exercises
 	CommentService  Comments
+	EmailService    Email
 }
 
 func NewService(
 	repository repository.Repository,
+	config config.Config,
 ) *Service {
+	emailService := NewEmailService(config)
+
 	return &Service{
 		repository:      repository,
-		UserService:     NewUserService(repository.Users),
+		UserService:     NewUserService(repository.Users, *emailService),
 		CourseService:   NewCourseService(repository.Courses, repository.Users),
 		LectureService:  NewLectureService(repository.Lectures),
 		ExerciseService: NewExerciseService(repository.Exercises),
 		CommentService:  NewCommentService(repository.Comments),
+		EmailService:    emailService,
 	}
 }

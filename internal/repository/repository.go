@@ -15,6 +15,7 @@ type Users interface {
 	DeleteUser(id int) error
 	UpdatePassword(id int, password string) (*domain.User, error)
 	SignUpForCourse(userID, courseID int) error
+	UpdatePasswordByEmail(email, password string) (*domain.User, error)
 }
 
 type Courses interface {
