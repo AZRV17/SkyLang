@@ -146,6 +146,7 @@ type Image interface {
 	SetCourseImage(id int, image string) error
 	SetUserAvatar(id int, avatar string) error
 	GetUserAvatar(id int) (os.File, error)
+	GetCourseIcon(id int) (os.File, error)
 }
 
 type Service struct {

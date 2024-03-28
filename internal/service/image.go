@@ -108,6 +108,17 @@ func (i ImageService) GetUserAvatar(id int) (os.File, error) {
 	return *img, err
 }
 
+func (i ImageService) GetCourseIcon(id int) (os.File, error) {
+	course, err := i.courseRepo.GetCourseByID(id)
+	if err != nil {
+		return os.File{}, err
+	}
+
+	img, err := os.Open(course.Icon)
+
+	return *img, err
+}
+
 func saveImage(resizedImg image.Image, originalFormat string, outputPath string) error {
 	outFile, err := os.Create(outputPath)
 	if err != nil {
