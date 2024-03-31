@@ -17,12 +17,34 @@ func NewCourseService(repository repository.Courses, repositoryUser repository.U
 	}
 }
 
-func (c CourseService) GetCourseByID(id int) (*domain.Course, error) {
-	return c.repositoryCourse.GetCourseByID(id)
+func (c CourseService) GetCourseByID(id int) (*GetCourseOutput, error) {
+	course, err := c.repositoryCourse.GetCourseByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GetCourseOutput{
+		Course: *course,
+		Author: *course.Author,
+	}, nil
 }
 
-func (c CourseService) GetAllCourses() ([]domain.Course, error) {
-	return c.repositoryCourse.GetAllCourses()
+func (c CourseService) GetAllCourses() ([]GetCourseOutput, error) {
+	var output []GetCourseOutput
+
+	courses, err := c.repositoryCourse.GetAllCourses()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, course := range courses {
+		output = append(output, GetCourseOutput{
+			Course: course,
+			Author: *course.Author,
+		})
+	}
+
+	return output, nil
 }
 
 func (c CourseService) CreateCourse(courseInput CreateCourseInput) (*domain.Course, error) {
@@ -66,8 +88,16 @@ func (c CourseService) GetCourseByUserID(id int) ([]domain.Course, error) {
 	return c.repositoryCourse.GetCourseByUserID(id)
 }
 
-func (c CourseService) GetCourseByTitle(title string) (*domain.Course, error) {
-	return c.repositoryCourse.GetCourseByTitle(title)
+func (c CourseService) GetCourseByTitle(title string) (*GetCourseOutput, error) {
+	course, err := c.repositoryCourse.GetCourseByTitle(title)
+	if err != nil {
+		return nil, err
+	}
+
+	return &GetCourseOutput{
+		Course: *course,
+		Author: *course.Author,
+	}, nil
 }
 
 func (c CourseService) SortCourseByTitle() ([]domain.Course, error) {

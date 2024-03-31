@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/AZRV17/Skylang/internal/domain"
 	"gorm.io/gorm"
+	"log"
 )
 
 type CourseRepository struct {
@@ -38,7 +39,7 @@ func (c CourseRepository) GetAllCourses() ([]domain.Course, error) {
 
 	tx := c.db.Begin()
 
-	if err := tx.Find(&courses).Error; err != nil {
+	if err := tx.Preload("Author").Find(&courses).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -47,6 +48,8 @@ func (c CourseRepository) GetAllCourses() ([]domain.Course, error) {
 		tx.Rollback()
 		return nil, err
 	}
+
+	log.Println(courses[0].Author)
 
 	return courses, nil
 }

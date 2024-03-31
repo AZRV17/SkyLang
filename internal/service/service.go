@@ -57,13 +57,18 @@ type UpdateCourseInput struct {
 	Exercises   []domain.Exercise `json:"exercises"`
 }
 
+type GetCourseOutput struct {
+	Course domain.Course `json:"course"`
+	Author domain.User   `json:"author"`
+}
+
 type Courses interface {
-	GetCourseByID(id int) (*domain.Course, error)
-	GetAllCourses() ([]domain.Course, error)
+	GetCourseByID(id int) (*GetCourseOutput, error)
+	GetAllCourses() ([]GetCourseOutput, error)
 	CreateCourse(courseInput CreateCourseInput) (*domain.Course, error)
 	UpdateCourse(courseInput UpdateCourseInput) (*domain.Course, error)
 	DeleteCourse(id int) error
-	GetCourseByTitle(title string) (*domain.Course, error)
+	GetCourseByTitle(title string) (*GetCourseOutput, error)
 	FilterCoursesByTitle(filter string) ([]domain.Course, error)
 	SortCourseByTitle() ([]domain.Course, error)
 	SortCourseByDate() ([]domain.Course, error)
