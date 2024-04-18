@@ -17,6 +17,9 @@ type Users interface {
 	SignUpForCourse(userID, courseID int) error
 	UpdatePasswordByEmail(email, password string) (*domain.User, error)
 	SetUserAvatar(id int, avatar string) (*domain.User, error)
+	CreateUserCourse(userID, courseID int) error
+	RemoveUserCourse(userID, courseID int) error
+	UpdateUserCourseStatus(userID, courseID int, status string) error
 }
 
 type Courses interface {
@@ -40,6 +43,7 @@ type Lectures interface {
 	CreateLecture(lecture domain.Lecture) (*domain.Lecture, error)
 	UpdateLecture(lecture domain.Lecture) (*domain.Lecture, error)
 	DeleteLecture(id int) error
+	GetLecturesByCourseID(courseID int) ([]domain.Lecture, error)
 }
 
 type Exercises interface {
@@ -59,12 +63,18 @@ type Comments interface {
 	GetCommentsByCourseID(id int) ([]domain.Comment, error)
 }
 
+type Ratings interface {
+	CreateRating(rating domain.Rating) (*domain.Rating, error)
+	GetRatingsByCourseID(id int) ([]domain.Rating, error)
+}
+
 type Repository struct {
 	Users     Users
 	Courses   Courses
 	Lectures  Lectures
 	Exercises Exercises
 	Comments  Comments
+	Ratings   Ratings
 }
 
 func NewRepository(db *gorm.DB) *Repository {
@@ -74,5 +84,6 @@ func NewRepository(db *gorm.DB) *Repository {
 		Lectures:  NewLectureRepository(db.Model(domain.Lecture{})),
 		Exercises: NewExerciseRepository(db.Model(domain.Exercise{})),
 		Comments:  NewCommentRepository(db.Model(domain.Comment{})),
+		Ratings:   NewRatingRepository(db.Model(domain.Rating{})),
 	}
 }

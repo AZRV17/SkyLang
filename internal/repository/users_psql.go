@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/AZRV17/Skylang/internal/domain"
 	"gorm.io/gorm"
+	"log"
 )
 
 type UserRepository struct {
@@ -20,7 +21,7 @@ func (u UserRepository) SignInByLogin(login, password string) (*domain.User, err
 
 	tx := u.db.Begin()
 
-	if err := tx.First(&user, "login = ?", login).Error; err != nil {
+	if err := tx.Preload("Courses").First(&user, "login = ?", login).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -42,7 +43,7 @@ func (u UserRepository) SignInByEmail(email, password string) (*domain.User, err
 
 	tx := u.db.Begin()
 
-	if err := tx.First(&user, "email = ?", email).Error; err != nil {
+	if err := tx.Preload("Courses").First(&user, "email = ?", email).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -80,10 +81,12 @@ func (u UserRepository) GetUserByID(id int) (*domain.User, error) {
 
 	tx := u.db.Begin()
 
-	if err := tx.First(&user, "id = ?", id).Error; err != nil {
+	if err := tx.Preload("Courses").First(&user, "id = ?", id).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
+
+	log.Println(user)
 
 	if err := tx.Commit().Error; err != nil {
 		tx.Rollback()
@@ -98,7 +101,7 @@ func (u UserRepository) GetAllUsers() ([]domain.User, error) {
 
 	tx := u.db.Begin()
 
-	if err := tx.Find(&users).Error; err != nil {
+	if err := tx.Preload("Courses").Find(&users).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -114,7 +117,7 @@ func (u UserRepository) GetAllUsers() ([]domain.User, error) {
 func (u UserRepository) UpdateUser(user domain.User) (*domain.User, error) {
 	tx := u.db.Begin()
 
-	if err := tx.Save(&user).Error; err != nil {
+	if err := tx.Preload("Courses").Save(&user).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -226,4 +229,55 @@ func (u UserRepository) SetUserAvatar(id int, avatar string) (*domain.User, erro
 	}
 
 	return &user, nil
+}
+
+func (u UserRepository) UpdateUserCourseStatus(userID, courseID int, status string) error {
+	tx := u.db.Begin()
+
+	if err := tx.Model(&domain.User{}).Where("user_id = ? AND course_id = ?", userID, courseID).Update("status", status).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
+func (u UserRepository) CreateUserCourse(userID, courseID int) error {
+	tx := u.db.Begin()
+
+	if err := tx.Model(&domain.UserCourse{}).Create(&domain.UserCourse{
+		UserID:   userID,
+		CourseID: courseID,
+	}).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
+func (u UserRepository) RemoveUserCourse(userID, courseID int) error {
+	tx := u.db.Begin()
+
+	if err := tx.Delete(&domain.UserCourse{}, "user_id = ? AND course_id = ?", userID, courseID).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
 }

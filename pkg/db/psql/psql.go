@@ -25,6 +25,10 @@ func Connect(dsn string) error {
 		return err
 	}
 
+	if err := DB.AutoMigrate(&domain.UserCourse{}); err != nil {
+		return err
+	}
+
 	if err := DB.AutoMigrate(&domain.Lecture{}); err != nil {
 		return err
 	}
@@ -34,6 +38,10 @@ func Connect(dsn string) error {
 	}
 
 	if err := DB.AutoMigrate(&domain.Comment{}); err != nil {
+		return err
+	}
+
+	if err := DB.AutoMigrate(&domain.Rating{}); err != nil {
 		return err
 	}
 

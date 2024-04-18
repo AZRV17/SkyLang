@@ -3,17 +3,20 @@ package service
 import (
 	"github.com/AZRV17/Skylang/internal/domain"
 	"github.com/AZRV17/Skylang/internal/repository"
+	"log"
 )
 
 type CourseService struct {
 	repositoryCourse repository.Courses
 	repositoryUser   repository.Users
+	serviceRating    RatingService
 }
 
-func NewCourseService(repository repository.Courses, repositoryUser repository.Users) *CourseService {
+func NewCourseService(repository repository.Courses, repositoryUser repository.Users, ratingService RatingService) *CourseService {
 	return &CourseService{
 		repositoryCourse: repository,
 		repositoryUser:   repositoryUser,
+		serviceRating:    ratingService,
 	}
 }
 
@@ -53,7 +56,6 @@ func (c CourseService) CreateCourse(courseInput CreateCourseInput) (*domain.Cour
 		Description: courseInput.Description,
 		Language:    courseInput.Language,
 		Icon:        courseInput.Icon,
-		Grate:       courseInput.Grate,
 		AuthorID:    courseInput.Author,
 	}
 
@@ -67,7 +69,6 @@ func (c CourseService) UpdateCourse(courseInput UpdateCourseInput) (*domain.Cour
 		Description: courseInput.Description,
 		Language:    courseInput.Language,
 		Icon:        courseInput.Icon,
-		Grate:       courseInput.Grate,
 		AuthorID:    courseInput.Author,
 		Lectures:    courseInput.Lectures,
 		Exercises:   courseInput.Exercises,
@@ -110,4 +111,31 @@ func (c CourseService) SortCourseByDate() ([]domain.Course, error) {
 
 func (c CourseService) SortCourseByRating() ([]domain.Course, error) {
 	return c.repositoryCourse.SortCourseByRating()
+}
+
+func (c CourseService) UpdateCourseGrate(id int, grate *CreateRatingInput) error {
+	course, err := c.repositoryCourse.GetCourseByID(id)
+	if err != nil {
+		return err
+	}
+
+	log.Println(grate)
+
+	returnedGrate, err := c.serviceRating.CreateRating(grate)
+	if err != nil {
+		return err
+	}
+
+	course.Grates = append(course.Grates, *returnedGrate)
+
+	totalRate := 0
+	for g := range course.Grates {
+		totalRate += course.Grates[g].Grate
+	}
+
+	course.Rating = totalRate / len(course.Grates)
+
+	_, err = c.repositoryCourse.UpdateCourse(*course)
+
+	return err
 }

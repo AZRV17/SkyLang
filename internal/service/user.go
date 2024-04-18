@@ -119,3 +119,15 @@ func (u UserService) UpdatePasswordByEmail(email, password string) (*domain.User
 
 	return u.repository.UpdatePasswordByEmail(email, string(hashPass))
 }
+
+func (u UserService) CreateUserCourse(userID, courseID int) error {
+	return u.repository.CreateUserCourse(userID, courseID)
+}
+
+func (u UserService) UpdateUserCourseStatus(userID, courseID int, status string) error {
+	return u.repository.UpdateUserCourseStatus(userID, courseID, status)
+}
+
+func (u UserService) DeleteUserCourse(userID, courseID int) error {
+	return u.repository.RemoveUserCourse(userID, courseID)
+}

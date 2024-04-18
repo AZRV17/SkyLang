@@ -7,7 +7,7 @@ type Comment struct {
 	CourseID  int       `json:"course_id"`
 	Course    *Course   `json:"-" gorm:"foreignKey:CourseID"`
 	AuthorID  int       `json:"author_id"`
-	Author    *User     `json:"-" gorm:"foreignKey:AuthorID"`
+	Author    *User     `json:"author" gorm:"foreignKey:AuthorID"`
 	Content   string    `json:"content"`
 	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`

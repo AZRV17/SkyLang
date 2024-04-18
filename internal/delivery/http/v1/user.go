@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/AZRV17/Skylang/internal/service"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -24,6 +25,9 @@ func (h *Handler) initUserRoutes(r *gin.Engine) {
 		users.PUT("/updatePasswordByEmail", h.updatePasswordByEmail)
 		users.PUT("/:id/updateAvatar", h.updateAvatar)
 		users.GET("/:id/avatar", h.getAvatar)
+		users.PUT("/:id/createUserCourse", h.createUserCourse)
+		users.PUT("/:id/deleteUserCourse", h.deleteUserCourse)
+		users.PUT("/:id/updateUserCourseStatus", h.updateUserCourseStatus)
 	}
 }
 
@@ -301,4 +305,73 @@ func (h *Handler) getAvatar(c *gin.Context) {
 	}
 
 	c.File(avatar.Name())
+}
+
+type createUserCourseInput struct {
+	UserID   int `json:"user_id"`
+	CourseID int `json:"course_id"`
+}
+
+func (h *Handler) createUserCourse(c *gin.Context) {
+	var input createUserCourseInput
+	log.Println("123")
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Println("123")
+
+	err := h.service.UserService.CreateUserCourse(input.UserID, input.CourseID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	log.Println("123")
+
+	c.JSON(http.StatusOK, gin.H{"message": "User course created"})
+}
+
+type deleteUserCourseInput struct {
+	UserID   int `json:"user_id"`
+	CourseID int `json:"course_id"`
+}
+
+func (h *Handler) deleteUserCourse(c *gin.Context) {
+	var input deleteUserCourseInput
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := h.service.UserService.DeleteUserCourse(input.UserID, input.CourseID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User course deleted"})
+}
+
+type updateUserCourseStatusInput struct {
+	UserID   int    `json:"user_id"`
+	CourseID int    `json:"course_id"`
+	Status   string `json:"status"`
+}
+
+func (h *Handler) updateUserCourseStatus(c *gin.Context) {
+	var input updateUserCourseStatusInput
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	err := h.service.UserService.UpdateUserCourseStatus(input.UserID, input.CourseID, input.Status)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User course status updated"})
 }

@@ -20,7 +20,7 @@ func (c CommentRepository) GetCommentByID(id int) (*domain.Comment, error) {
 
 	tx := c.db.Begin()
 
-	if err := tx.First(&comment, "id = ?", id).Error; err != nil {
+	if err := tx.Preload("Author").First(&comment, "id = ?", id).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -104,7 +104,7 @@ func (c CommentRepository) GetCommentsByCourseID(id int) ([]domain.Comment, erro
 
 	tx := c.db.Begin()
 
-	if err := tx.Where("course_id = ?", id).Find(&comments).Error; err != nil {
+	if err := tx.Preload("Author").Where("course_id = ?", id).Find(&comments).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}

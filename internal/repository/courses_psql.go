@@ -62,7 +62,7 @@ func (c CourseRepository) CreateCourse(course domain.Course) (*domain.Course, er
 		return nil, err
 	}
 
-	if err := tx.Last(&course).Error; err != nil {
+	if err := tx.Preload("Author").Last(&course).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (c CourseRepository) CreateCourse(course domain.Course) (*domain.Course, er
 func (c CourseRepository) UpdateCourse(course domain.Course) (*domain.Course, error) {
 	tx := c.db.Begin()
 
-	if err := tx.Save(&course).Error; err != nil {
+	if err := tx.Where("id = ?", course.ID).Save(&course).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}

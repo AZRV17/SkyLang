@@ -34,15 +34,17 @@ type Users interface {
 	SignUpForCourse(userID, courseID int) error
 	ResetPassword(email string) (int, error)
 	UpdatePasswordByEmail(email, password string) (*domain.User, error)
+	CreateUserCourse(userID, courseID int) error
+	UpdateUserCourseStatus(userID, courseID int, status string) error
+	DeleteUserCourse(userID, courseID int) error
 }
 
 type CreateCourseInput struct {
-	Name        string  `json:"name"`
-	Description string  `json:"description"`
-	Language    string  `json:"language"`
-	Icon        string  `json:"icon"`
-	Grate       float32 `json:"grate"`
-	Author      int     `json:"author"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Language    string `json:"language"`
+	Icon        string `json:"icon"`
+	Author      int    `json:"author"`
 }
 
 type UpdateCourseInput struct {
@@ -52,6 +54,7 @@ type UpdateCourseInput struct {
 	Language    string            `json:"language"`
 	Icon        string            `json:"icon"`
 	Grate       float32           `json:"grate"`
+	ReviewCount int               `json:"review_count"`
 	Author      int               `json:"author"`
 	Lectures    []domain.Lecture  `json:"lectures"`
 	Exercises   []domain.Exercise `json:"exercises"`
@@ -73,12 +76,24 @@ type Courses interface {
 	SortCourseByTitle() ([]domain.Course, error)
 	SortCourseByDate() ([]domain.Course, error)
 	SortCourseByRating() ([]domain.Course, error)
+	UpdateCourseGrate(id int, grate *CreateRatingInput) error
+}
+
+type CreateRatingInput struct {
+	UserID   int
+	CourseID int
+	Grate    int
+}
+
+type Ratings interface {
+	CreateRating(input *CreateRatingInput) (*domain.Rating, error)
+	GetRatingsByCourseID(id int) ([]domain.Rating, error)
 }
 
 type CreateLectureInput struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
-	CourseID    uint   `json:"courseID"`
+	Course      int    `json:"course"`
 }
 
 type UpdateLectureInput struct {
@@ -94,6 +109,7 @@ type Lectures interface {
 	CreateLecture(lectureInput CreateLectureInput) (*domain.Lecture, error)
 	UpdateLecture(lectureInput UpdateLectureInput) (*domain.Lecture, error)
 	DeleteLecture(id int) error
+	GetLecturesByCourseID(courseID int) ([]domain.Lecture, error)
 }
 
 type CreateExerciseInput struct {
@@ -123,15 +139,15 @@ type Exercises interface {
 
 type CreateCommentInput struct {
 	Content  string `json:"content"`
-	CourseID int    `json:"courseID"`
-	UserID   int    `json:"userID"`
+	CourseID int    `json:"course_id"`
+	UserID   int    `json:"user_id"`
 }
 
 type UpdateCommentInput struct {
-	ID       int    `json:"ID"`
+	ID       int    `json:"id"`
 	Content  string `json:"content"`
-	CourseID int    `json:"courseID"`
-	UserID   int    `json:"userID"`
+	CourseID int    `json:"course_id"`
+	UserID   int    `json:"user_id"`
 }
 
 type Comments interface {
@@ -158,6 +174,7 @@ type Service struct {
 	repository      repository.Repository
 	UserService     Users
 	CourseService   Courses
+	RatingService   Ratings
 	LectureService  Lectures
 	ExerciseService Exercises
 	CommentService  Comments
@@ -170,11 +187,13 @@ func NewService(
 	config config.Config,
 ) *Service {
 	emailService := NewEmailService(config)
+	ratingService := NewRatingService(repository.Ratings)
 
 	return &Service{
 		repository:      repository,
 		UserService:     NewUserService(repository.Users, *emailService),
-		CourseService:   NewCourseService(repository.Courses, repository.Users),
+		CourseService:   NewCourseService(repository.Courses, repository.Users, *ratingService),
+		RatingService:   ratingService,
 		LectureService:  NewLectureService(repository.Lectures),
 		ExerciseService: NewExerciseService(repository.Exercises),
 		CommentService:  NewCommentService(repository.Comments),

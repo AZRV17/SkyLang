@@ -27,7 +27,7 @@ func (l LectureService) CreateLecture(lectureInput CreateLectureInput) (*domain.
 	lecture := domain.Lecture{
 		Name:        lectureInput.Name,
 		Description: lectureInput.Description,
-		CourseID:    lectureInput.CourseID,
+		CourseID:    lectureInput.Course,
 	}
 
 	return l.repository.CreateLecture(lecture)
@@ -38,7 +38,7 @@ func (l LectureService) UpdateLecture(lectureInput UpdateLectureInput) (*domain.
 		ID:          lectureInput.ID,
 		Name:        lectureInput.Name,
 		Description: lectureInput.Description,
-		CourseID:    lectureInput.CourseID,
+		CourseID:    int(lectureInput.CourseID),
 	}
 
 	return l.repository.UpdateLecture(lecture)
@@ -46,4 +46,8 @@ func (l LectureService) UpdateLecture(lectureInput UpdateLectureInput) (*domain.
 
 func (l LectureService) DeleteLecture(id int) error {
 	return l.repository.DeleteLecture(id)
+}
+
+func (l LectureService) GetLecturesByCourseID(courseID int) ([]domain.Lecture, error) {
+	return l.repository.GetLecturesByCourseID(courseID)
 }

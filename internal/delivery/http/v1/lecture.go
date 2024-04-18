@@ -15,6 +15,7 @@ func (h *Handler) initLectureRoutes(r *gin.Engine) {
 		lectures.GET("/:id", h.getLectureById)
 		lectures.PUT("/:id", h.updateLecture)
 		lectures.DELETE("/:id", h.deleteLecture)
+		lectures.GET("/course/:id", h.getLecturesByCourseID)
 	}
 }
 
@@ -90,4 +91,20 @@ func (h *Handler) deleteLecture(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Lecture deleted"})
+}
+
+func (h *Handler) getLecturesByCourseID(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	lectures, err := h.service.LectureService.GetLecturesByCourseID(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, lectures)
 }

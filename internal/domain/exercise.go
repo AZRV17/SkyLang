@@ -8,7 +8,7 @@ type Exercise struct {
 	Description   string    `json:"description"`
 	CorrectAnswer string    `json:"correctAnswer"`
 	Difficulty    string    `json:"difficulty"`
-	CourseID      uint      `json:"courseID"`
+	CourseID      uint      `json:"course_id"`
 	CreatedAt     time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt     time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
 }

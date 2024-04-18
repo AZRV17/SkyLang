@@ -3,6 +3,7 @@ package v1
 import (
 	"github.com/AZRV17/Skylang/internal/service"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"strconv"
 )
@@ -17,6 +18,7 @@ func (h *Handler) initCourseRoutes(r *gin.Engine) {
 		courses.DELETE("/:id", h.deleteCourse)
 		courses.PUT("/:id/updateIcon", h.updateIcon)
 		courses.GET("/:id/icon", h.getIcon)
+		courses.PUT("/:id/updateGrate", h.updateCourseGrate)
 	}
 }
 
@@ -186,4 +188,38 @@ func (h *Handler) getIcon(c *gin.Context) {
 	}
 
 	c.File(icon.Name())
+}
+
+type updateGrateInput struct {
+	UserID int `json:"user_id"`
+	Grate  int `json:"grate"`
+}
+
+func (h *Handler) updateCourseGrate(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var input updateGrateInput
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	grate := service.CreateRatingInput{
+		CourseID: id,
+		UserID:   input.UserID,
+		Grate:    input.Grate,
+	}
+
+	err = h.service.CourseService.UpdateCourseGrate(id, &grate)
+	if err != nil {
+		log.Println(err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Grate updated"})
 }
