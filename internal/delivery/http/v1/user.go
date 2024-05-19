@@ -28,6 +28,7 @@ func (h *Handler) initUserRoutes(r *gin.Engine) {
 		users.PUT("/:id/createUserCourse", h.createUserCourse)
 		users.PUT("/:id/deleteUserCourse", h.deleteUserCourse)
 		users.PUT("/:id/updateUserCourseStatus", h.updateUserCourseStatus)
+		users.PUT("/:id/updateUserLoginAndEmail", h.updateUserLoginAndEmail)
 	}
 }
 
@@ -374,4 +375,32 @@ func (h *Handler) updateUserCourseStatus(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "User course status updated"})
+}
+
+type updateUserLoginAndEmailInput struct {
+	Login string `json:"login"`
+	Email string `json:"email"`
+}
+
+func (h *Handler) updateUserLoginAndEmail(c *gin.Context) {
+	var input updateUserLoginAndEmailInput
+
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := c.BindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	_, err = h.service.UserService.UpdateUserLoginAndEmail(id, input.Login, input.Email)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User login and email updated"})
 }

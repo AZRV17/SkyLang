@@ -12,6 +12,7 @@ type Users interface {
 	GetUserByID(id int) (*domain.User, error)
 	GetAllUsers() ([]domain.User, error)
 	UpdateUser(user domain.User) (*domain.User, error)
+	UpdateUserLoginAndEmail(id int, login, email string) (*domain.User, error)
 	DeleteUser(id int) error
 	UpdatePassword(id int, password string) (*domain.User, error)
 	SignUpForCourse(userID, courseID int) error
@@ -20,6 +21,7 @@ type Users interface {
 	CreateUserCourse(userID, courseID int) error
 	RemoveUserCourse(userID, courseID int) error
 	UpdateUserCourseStatus(userID, courseID int, status string) error
+	UpdateUserRole(userID int, role string) error
 }
 
 type Courses interface {
@@ -35,6 +37,7 @@ type Courses interface {
 	SortCourseByDate() ([]domain.Course, error)
 	SortCourseByRating() ([]domain.Course, error)
 	SetCourseIcon(id int, icon string) error
+	GetCourseByAuthorID(id int) ([]domain.Course, error)
 }
 
 type Lectures interface {
@@ -52,6 +55,7 @@ type Exercises interface {
 	CreateExercise(exercise domain.Exercise) (*domain.Exercise, error)
 	UpdateExercise(exercise domain.Exercise) (*domain.Exercise, error)
 	DeleteExercise(id int) error
+	GetExercisesByCourseID(courseID int) ([]domain.Exercise, error)
 }
 
 type Comments interface {
@@ -68,22 +72,32 @@ type Ratings interface {
 	GetRatingsByCourseID(id int) ([]domain.Rating, error)
 }
 
+type AuthorRequests interface {
+	GetAuthorRequests() ([]domain.AuthorRequest, error)
+	GetAuthorRequestByID(id int) (*domain.AuthorRequest, error)
+	CreateAuthorRequest(authorRequest domain.AuthorRequest) (*domain.AuthorRequest, error)
+	DeleteAuthorRequest(id int) error
+	GetAuthorRequestByUserID(id int) (*domain.AuthorRequest, error)
+}
+
 type Repository struct {
-	Users     Users
-	Courses   Courses
-	Lectures  Lectures
-	Exercises Exercises
-	Comments  Comments
-	Ratings   Ratings
+	Users          Users
+	Courses        Courses
+	Lectures       Lectures
+	Exercises      Exercises
+	Comments       Comments
+	Ratings        Ratings
+	AuthorRequests AuthorRequests
 }
 
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
-		Users:     NewUserRepository(db.Model(domain.User{})),
-		Courses:   NewCourseRepository(db.Model(domain.Course{})),
-		Lectures:  NewLectureRepository(db.Model(domain.Lecture{})),
-		Exercises: NewExerciseRepository(db.Model(domain.Exercise{})),
-		Comments:  NewCommentRepository(db.Model(domain.Comment{})),
-		Ratings:   NewRatingRepository(db.Model(domain.Rating{})),
+		Users:          NewUserRepository(db.Model(domain.User{})),
+		Courses:        NewCourseRepository(db.Model(domain.Course{})),
+		Lectures:       NewLectureRepository(db.Model(domain.Lecture{})),
+		Exercises:      NewExerciseRepository(db.Model(domain.Exercise{})),
+		Comments:       NewCommentRepository(db.Model(domain.Comment{})),
+		Ratings:        NewRatingRepository(db.Model(domain.Rating{})),
+		AuthorRequests: NewAuthorRequestRepository(db.Model(domain.AuthorRequest{})),
 	}
 }

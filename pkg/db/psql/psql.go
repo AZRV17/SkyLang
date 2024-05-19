@@ -45,6 +45,10 @@ func Connect(dsn string) error {
 		return err
 	}
 
+	if err := DB.AutoMigrate(&domain.AuthorRequest{}); err != nil {
+		return err
+	}
+
 	return nil
 }
 

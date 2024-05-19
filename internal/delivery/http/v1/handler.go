@@ -24,4 +24,5 @@ func (h *Handler) Init(r *gin.Engine) {
 	h.initLectureRoutes(r)
 	h.initCourseRoutes(r)
 	h.initCommentRoutes(r)
+	h.initAuthorRequestRoutes(r)
 }

@@ -235,3 +235,21 @@ func (c CourseRepository) SetCourseIcon(id int, icon string) error {
 
 	return nil
 }
+
+func (c CourseRepository) GetCourseByAuthorID(id int) ([]domain.Course, error) {
+	var courses []domain.Course
+
+	tx := c.db.Begin()
+
+	if err := tx.Preload("Author").Where("author_id = ?", id).Find(&courses).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	return courses, nil
+}

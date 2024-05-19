@@ -15,6 +15,7 @@ func (h *Handler) initExerciseRoutes(r *gin.Engine) {
 		exercises.GET("/:id", h.getExerciseById)
 		exercises.PUT("/:id", h.updateExercise)
 		exercises.DELETE("/:id", h.deleteExercise)
+		exercises.GET("/course/:id", h.getExercisesByCourse)
 	}
 }
 
@@ -90,4 +91,20 @@ func (h *Handler) deleteExercise(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Exercise deleted"})
+}
+
+func (h *Handler) getExercisesByCourse(c *gin.Context) {
+	courseID, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	exercises, err := h.service.ExerciseService.GetExercisesByCourseID(courseID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, exercises)
 }

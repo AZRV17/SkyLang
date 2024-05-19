@@ -27,6 +27,10 @@ func (e ExerciseService) CreateExercise(exerciseInput CreateExerciseInput) (*dom
 	exercise := domain.Exercise{
 		Name:          exerciseInput.Name,
 		Description:   exerciseInput.Description,
+		FirstVariant:  exerciseInput.FirstVariant,
+		SecondVariant: exerciseInput.SecondVariant,
+		ThirdVariant:  exerciseInput.ThirdVariant,
+		FourthVariant: exerciseInput.FourthVariant,
 		CorrectAnswer: exerciseInput.CorrectAnswer,
 		Difficulty:    exerciseInput.Difficulty,
 		CourseID:      exerciseInput.CourseID,
@@ -41,6 +45,10 @@ func (e ExerciseService) UpdateExercise(exerciseInput UpdateExerciseInput) (*dom
 		Name:          exerciseInput.Name,
 		Description:   exerciseInput.Description,
 		CorrectAnswer: exerciseInput.CorrectAnswer,
+		FirstVariant:  exerciseInput.FirstVariant,
+		SecondVariant: exerciseInput.SecondVariant,
+		ThirdVariant:  exerciseInput.ThirdVariant,
+		FourthVariant: exerciseInput.FourthVariant,
 		Difficulty:    exerciseInput.Difficulty,
 		CourseID:      exerciseInput.CourseID,
 	}
@@ -50,4 +58,8 @@ func (e ExerciseService) UpdateExercise(exerciseInput UpdateExerciseInput) (*dom
 
 func (e ExerciseService) DeleteExercise(id int) error {
 	return e.repository.DeleteExercise(id)
+}
+
+func (e ExerciseService) GetExercisesByCourseID(id int) ([]domain.Exercise, error) {
+	return e.repository.GetExercisesByCourseID(id)
 }

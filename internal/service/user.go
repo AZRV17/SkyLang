@@ -91,6 +91,10 @@ func (u UserService) UpdatePassword(id int, password string) (*domain.User, erro
 	return u.repository.UpdatePassword(id, string(hashPass))
 }
 
+func (u UserService) UpdateUserLoginAndEmail(id int, login, email string) (*domain.User, error) {
+	return u.repository.UpdateUserLoginAndEmail(id, login, email)
+}
+
 func (u UserService) DeleteUser(id int) error {
 	return u.repository.DeleteUser(id)
 }
@@ -130,4 +134,8 @@ func (u UserService) UpdateUserCourseStatus(userID, courseID int, status string)
 
 func (u UserService) DeleteUserCourse(userID, courseID int) error {
 	return u.repository.RemoveUserCourse(userID, courseID)
+}
+
+func (u UserService) UpdateUserRole(userID int, role string) error {
+	return u.repository.UpdateUserRole(userID, role)
 }

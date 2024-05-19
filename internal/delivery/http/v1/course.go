@@ -19,6 +19,7 @@ func (h *Handler) initCourseRoutes(r *gin.Engine) {
 		courses.PUT("/:id/updateIcon", h.updateIcon)
 		courses.GET("/:id/icon", h.getIcon)
 		courses.PUT("/:id/updateGrate", h.updateCourseGrate)
+		courses.GET("/author/:id", h.getCourseByAuthorId)
 	}
 }
 
@@ -29,8 +30,24 @@ func (h *Handler) createCourse(c *gin.Context) {
 		return
 	}
 
+	icon := input.Icon
+
+	input.Icon = ""
+
 	course, err := h.service.CourseService.CreateCourse(input)
 	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if icon == "" {
+		c.JSON(http.StatusOK, course)
+		return
+	}
+
+	err = h.service.ImageService.SetCourseImage(course.ID, icon)
+	if err != nil {
+		log.Println(err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -222,4 +239,20 @@ func (h *Handler) updateCourseGrate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Grate updated"})
+}
+
+func (h *Handler) getCourseByAuthorId(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	courses, err := h.service.CourseService.GetCourseByAuthorID(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, courses)
 }

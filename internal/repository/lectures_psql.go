@@ -75,7 +75,7 @@ func (l Lecture) CreateLecture(lecture domain.Lecture) (*domain.Lecture, error) 
 func (l Lecture) UpdateLecture(lecture domain.Lecture) (*domain.Lecture, error) {
 	tx := l.db.Begin()
 
-	if err := tx.Save(&lecture).Error; err != nil {
+	if err := tx.Where("id = ?", lecture.ID).Save(&lecture).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func (l Lecture) UpdateLecture(lecture domain.Lecture) (*domain.Lecture, error) 
 func (l Lecture) DeleteLecture(id int) error {
 	tx := l.db.Begin()
 
-	if err := tx.Delete(&domain.Lecture{}, "id = ?", id).Error; err != nil {
+	if err := tx.Where("id = ?", id).Delete(&domain.Lecture{}, "id = ?", id).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

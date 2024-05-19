@@ -15,11 +15,13 @@ type CreateUserInput struct {
 }
 
 type UpdateUserInput struct {
-	ID      int             `json:"id"`
-	Login   string          `json:"login"`
-	Email   string          `json:"email"`
-	Role    string          `json:"role"`
-	Courses []domain.Course `json:"courses"`
+	ID       int             `json:"id"`
+	Login    string          `json:"login"`
+	Password string          `json:"password"`
+	Avatar   string          `json:"avatar"`
+	Email    string          `json:"email"`
+	Role     string          `json:"role"`
+	Courses  []domain.Course `json:"courses"`
 }
 
 type Users interface {
@@ -30,6 +32,7 @@ type Users interface {
 	GetAllUsers() ([]domain.User, error)
 	UpdateUser(userInput UpdateUserInput) (*domain.User, error)
 	UpdatePassword(id int, password string) (*domain.User, error)
+	UpdateUserLoginAndEmail(id int, login, email string) (*domain.User, error)
 	DeleteUser(id int) error
 	SignUpForCourse(userID, courseID int) error
 	ResetPassword(email string) (int, error)
@@ -37,6 +40,7 @@ type Users interface {
 	CreateUserCourse(userID, courseID int) error
 	UpdateUserCourseStatus(userID, courseID int, status string) error
 	DeleteUserCourse(userID, courseID int) error
+	UpdateUserRole(userID int, role string) error
 }
 
 type CreateCourseInput struct {
@@ -60,23 +64,19 @@ type UpdateCourseInput struct {
 	Exercises   []domain.Exercise `json:"exercises"`
 }
 
-type GetCourseOutput struct {
-	Course domain.Course `json:"course"`
-	Author domain.User   `json:"author"`
-}
-
 type Courses interface {
-	GetCourseByID(id int) (*GetCourseOutput, error)
-	GetAllCourses() ([]GetCourseOutput, error)
+	GetCourseByID(id int) (*domain.Course, error)
+	GetAllCourses() ([]domain.Course, error)
 	CreateCourse(courseInput CreateCourseInput) (*domain.Course, error)
 	UpdateCourse(courseInput UpdateCourseInput) (*domain.Course, error)
 	DeleteCourse(id int) error
-	GetCourseByTitle(title string) (*GetCourseOutput, error)
+	GetCourseByTitle(title string) (*domain.Course, error)
 	FilterCoursesByTitle(filter string) ([]domain.Course, error)
 	SortCourseByTitle() ([]domain.Course, error)
 	SortCourseByDate() ([]domain.Course, error)
 	SortCourseByRating() ([]domain.Course, error)
 	UpdateCourseGrate(id int, grate *CreateRatingInput) error
+	GetCourseByAuthorID(id int) ([]domain.Course, error)
 }
 
 type CreateRatingInput struct {
@@ -115,6 +115,10 @@ type Lectures interface {
 type CreateExerciseInput struct {
 	Name          string `json:"name"`
 	Description   string `json:"description"`
+	FirstVariant  string `json:"firstVariant"`
+	SecondVariant string `json:"secondVariant"`
+	ThirdVariant  string `json:"thirdVariant"`
+	FourthVariant string `json:"fourthVariant"`
 	CorrectAnswer string `json:"correctAnswer"`
 	Difficulty    string `json:"difficulty"`
 	CourseID      uint   `json:"courseID"`
@@ -124,6 +128,10 @@ type UpdateExerciseInput struct {
 	ID            int    `json:"ID"`
 	Name          string `json:"name"`
 	Description   string `json:"description"`
+	FirstVariant  string `json:"firstVariant"`
+	SecondVariant string `json:"secondVariant"`
+	ThirdVariant  string `json:"thirdVariant"`
+	FourthVariant string `json:"fourthVariant"`
 	CorrectAnswer string `json:"correctAnswer"`
 	Difficulty    string `json:"difficulty"`
 	CourseID      uint   `json:"courseID"`
@@ -135,6 +143,7 @@ type Exercises interface {
 	CreateExercise(exerciseInput CreateExerciseInput) (*domain.Exercise, error)
 	UpdateExercise(exerciseInput UpdateExerciseInput) (*domain.Exercise, error)
 	DeleteExercise(id int) error
+	GetExercisesByCourseID(id int) ([]domain.Exercise, error)
 }
 
 type CreateCommentInput struct {
@@ -170,16 +179,29 @@ type Image interface {
 	GetCourseIcon(id int) (os.File, error)
 }
 
+type CreateAuthorRequestInput struct {
+	UserID int `json:"user_id"`
+}
+
+type AuthorRequests interface {
+	GetAuthorRequests() ([]domain.AuthorRequest, error)
+	GetAuthorRequestByID(id int) (*domain.AuthorRequest, error)
+	CreateAuthorRequest(authorRequestInput CreateAuthorRequestInput) (*domain.AuthorRequest, error)
+	DeleteAuthorRequest(id int) error
+	GetAuthorRequestByUserID(id int) (*domain.AuthorRequest, error)
+}
+
 type Service struct {
-	repository      repository.Repository
-	UserService     Users
-	CourseService   Courses
-	RatingService   Ratings
-	LectureService  Lectures
-	ExerciseService Exercises
-	CommentService  Comments
-	EmailService    Email
-	ImageService    Image
+	repository            repository.Repository
+	UserService           Users
+	CourseService         Courses
+	RatingService         Ratings
+	LectureService        Lectures
+	ExerciseService       Exercises
+	CommentService        Comments
+	EmailService          Email
+	ImageService          Image
+	AuthorRequestsService AuthorRequests
 }
 
 func NewService(
@@ -188,16 +210,18 @@ func NewService(
 ) *Service {
 	emailService := NewEmailService(config)
 	ratingService := NewRatingService(repository.Ratings)
+	userService := NewUserService(repository.Users, *emailService)
 
 	return &Service{
-		repository:      repository,
-		UserService:     NewUserService(repository.Users, *emailService),
-		CourseService:   NewCourseService(repository.Courses, repository.Users, *ratingService),
-		RatingService:   ratingService,
-		LectureService:  NewLectureService(repository.Lectures),
-		ExerciseService: NewExerciseService(repository.Exercises),
-		CommentService:  NewCommentService(repository.Comments),
-		EmailService:    emailService,
-		ImageService:    NewImageService(repository.Users, repository.Courses),
+		repository:            repository,
+		UserService:           userService,
+		CourseService:         NewCourseService(repository.Courses, repository.Users, *ratingService),
+		RatingService:         ratingService,
+		LectureService:        NewLectureService(repository.Lectures),
+		ExerciseService:       NewExerciseService(repository.Exercises),
+		CommentService:        NewCommentService(repository.Comments),
+		EmailService:          emailService,
+		ImageService:          NewImageService(repository.Users, repository.Courses),
+		AuthorRequestsService: NewAuthorRequestService(repository.AuthorRequests, *userService),
 	}
 }

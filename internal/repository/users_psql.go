@@ -117,7 +117,7 @@ func (u UserRepository) GetAllUsers() ([]domain.User, error) {
 func (u UserRepository) UpdateUser(user domain.User) (*domain.User, error) {
 	tx := u.db.Begin()
 
-	if err := tx.Preload("Courses").Save(&user).Error; err != nil {
+	if err := tx.Preload("Courses").Where("id = ?", user.ID).Save(&user).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
@@ -128,6 +128,22 @@ func (u UserRepository) UpdateUser(user domain.User) (*domain.User, error) {
 	}
 
 	return &user, nil
+}
+
+func (u UserRepository) UpdateUserLoginAndEmail(id int, login, email string) (*domain.User, error) {
+	tx := u.db.Begin()
+
+	if err := tx.Model(&domain.User{}).Where("id = ?", id).Update("login", login).Update("email", email).Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+
+	return nil, nil
 }
 
 func (u UserRepository) DeleteUser(id int) error {
@@ -270,6 +286,22 @@ func (u UserRepository) RemoveUserCourse(userID, courseID int) error {
 	tx := u.db.Begin()
 
 	if err := tx.Delete(&domain.UserCourse{}, "user_id = ? AND course_id = ?", userID, courseID).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	if err := tx.Commit().Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return nil
+}
+
+func (u UserRepository) UpdateUserRole(userID int, role string) error {
+	tx := u.db.Begin()
+
+	if err := tx.Model(&domain.User{}).Where("id = ?", userID).Update("role", role).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
