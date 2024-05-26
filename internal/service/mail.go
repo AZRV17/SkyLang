@@ -18,6 +18,7 @@ func NewEmailService(cfg config.Config) *EmailService {
 	}
 }
 
+// Функция для отправки письма
 func (m *EmailService) SendMailForPasswordReset(recipient string, resetCode int) error {
 	headerMap := make(map[string]string)
 

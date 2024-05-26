@@ -29,6 +29,7 @@ func NewImageService(userRepo repository.Users, courseRepo repository.Courses) *
 	}
 }
 
+// SetCourseImage сохраняет изображение курса
 func (i ImageService) SetCourseImage(id int, imgBase64 string) error {
 	imageData, err := base64.StdEncoding.DecodeString(imgBase64)
 	if err != nil {
@@ -62,6 +63,7 @@ func (i ImageService) SetCourseImage(id int, imgBase64 string) error {
 	return i.courseRepo.SetCourseIcon(id, absolutePath)
 }
 
+// SetUserAvatar сохраняет аватар пользователя
 func (i ImageService) SetUserAvatar(id int, avatar string) error {
 	imageData, err := base64.StdEncoding.DecodeString(avatar)
 	if err != nil {
@@ -97,6 +99,7 @@ func (i ImageService) SetUserAvatar(id int, avatar string) error {
 	return err
 }
 
+// GetUserAvatar возвращает аватар пользователя
 func (i ImageService) GetUserAvatar(id int) (os.File, error) {
 	user, err := i.userRepo.GetUserByID(id)
 	if err != nil {
@@ -108,6 +111,7 @@ func (i ImageService) GetUserAvatar(id int) (os.File, error) {
 	return *img, err
 }
 
+// GetCourseIcon возвращает иконку курса
 func (i ImageService) GetCourseIcon(id int) (os.File, error) {
 	course, err := i.courseRepo.GetCourseByID(id)
 	if err != nil {

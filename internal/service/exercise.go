@@ -19,10 +19,12 @@ func (e ExerciseService) GetExerciseByID(id int) (*domain.Exercise, error) {
 	return e.repository.GetExerciseByID(id)
 }
 
+// Функция получения всех упражнений
 func (e ExerciseService) GetAllExercises() ([]domain.Exercise, error) {
 	return e.repository.GetAllExercises()
 }
 
+// Функция создания нового упражнения
 func (e ExerciseService) CreateExercise(exerciseInput CreateExerciseInput) (*domain.Exercise, error) {
 	exercise := domain.Exercise{
 		Name:          exerciseInput.Name,
@@ -39,6 +41,7 @@ func (e ExerciseService) CreateExercise(exerciseInput CreateExerciseInput) (*dom
 	return e.repository.CreateExercise(exercise)
 }
 
+// Функция обновления упражнения
 func (e ExerciseService) UpdateExercise(exerciseInput UpdateExerciseInput) (*domain.Exercise, error) {
 	exercise := domain.Exercise{
 		ID:            exerciseInput.ID,

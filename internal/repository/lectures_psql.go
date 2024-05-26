@@ -5,16 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// Репозиторий для работы с таблицей lectures
 type Lecture struct {
 	db *gorm.DB
 }
 
+// Функция создания репозитория
 func NewLectureRepository(db *gorm.DB) *Lecture {
 	return &Lecture{
 		db: db,
 	}
 }
 
+// Функция получения записи
 func (l Lecture) GetLectureByID(id int) (*domain.Lecture, error) {
 	var lecture domain.Lecture
 
@@ -33,6 +36,7 @@ func (l Lecture) GetLectureByID(id int) (*domain.Lecture, error) {
 	return &lecture, nil
 }
 
+// Функция получения всех записей
 func (l Lecture) GetAllLectures() ([]domain.Lecture, error) {
 	var lectures []domain.Lecture
 
@@ -51,6 +55,7 @@ func (l Lecture) GetAllLectures() ([]domain.Lecture, error) {
 	return lectures, nil
 }
 
+// Функция создания записи
 func (l Lecture) CreateLecture(lecture domain.Lecture) (*domain.Lecture, error) {
 	tx := l.db.Begin()
 
@@ -72,6 +77,7 @@ func (l Lecture) CreateLecture(lecture domain.Lecture) (*domain.Lecture, error) 
 	return &lecture, nil
 }
 
+// Функция обновления записи
 func (l Lecture) UpdateLecture(lecture domain.Lecture) (*domain.Lecture, error) {
 	tx := l.db.Begin()
 
@@ -93,6 +99,7 @@ func (l Lecture) UpdateLecture(lecture domain.Lecture) (*domain.Lecture, error) 
 	return &lecture, nil
 }
 
+// Функция удаления
 func (l Lecture) DeleteLecture(id int) error {
 	tx := l.db.Begin()
 
@@ -109,6 +116,7 @@ func (l Lecture) DeleteLecture(id int) error {
 	return nil
 }
 
+// Функция получения записей по курсу
 func (l Lecture) GetLecturesByCourseID(courseID int) ([]domain.Lecture, error) {
 	var lectures []domain.Lecture
 

@@ -6,16 +6,19 @@ import (
 	"log"
 )
 
+// Репозиторий для работы с таблицей author_request
 type AuthorRequestRepository struct {
 	db *gorm.DB
 }
 
+// Функция создания репозитория
 func NewAuthorRequestRepository(db *gorm.DB) *AuthorRequestRepository {
 	return &AuthorRequestRepository{
 		db: db,
 	}
 }
 
+// Функция создания записи
 func (r *AuthorRequestRepository) CreateAuthorRequest(authorRequest domain.AuthorRequest) (*domain.AuthorRequest, error) {
 	tx := r.db.Begin()
 
@@ -32,6 +35,7 @@ func (r *AuthorRequestRepository) CreateAuthorRequest(authorRequest domain.Autho
 	return &authorRequest, nil
 }
 
+// Функция получения записи
 func (r *AuthorRequestRepository) GetAuthorRequestByID(id int) (*domain.AuthorRequest, error) {
 	var authorRequest domain.AuthorRequest
 
@@ -50,6 +54,7 @@ func (r *AuthorRequestRepository) GetAuthorRequestByID(id int) (*domain.AuthorRe
 	return &authorRequest, nil
 }
 
+// Функция получения всех записей
 func (r *AuthorRequestRepository) GetAuthorRequests() ([]domain.AuthorRequest, error) {
 	var authorRequests []domain.AuthorRequest
 
@@ -70,6 +75,7 @@ func (r *AuthorRequestRepository) GetAuthorRequests() ([]domain.AuthorRequest, e
 	return authorRequests, nil
 }
 
+// Функция удаления записи
 func (r *AuthorRequestRepository) DeleteAuthorRequest(id int) error {
 	tx := r.db.Begin()
 
@@ -86,6 +92,7 @@ func (r *AuthorRequestRepository) DeleteAuthorRequest(id int) error {
 	return nil
 }
 
+// Функция получения записи
 func (r *AuthorRequestRepository) GetAuthorRequestByUserID(id int) (*domain.AuthorRequest, error) {
 	var authorRequests domain.AuthorRequest
 

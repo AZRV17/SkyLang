@@ -14,6 +14,7 @@ import (
 	"net/http"
 )
 
+// Run - запуск приложения
 func Run() {
 	cfg, err := config.NewConfig("internal/config/config.yaml")
 	if err != nil {

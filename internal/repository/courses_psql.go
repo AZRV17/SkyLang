@@ -6,16 +6,19 @@ import (
 	"log"
 )
 
+// Репозиторий для работы с таблицей courses
 type CourseRepository struct {
 	db *gorm.DB
 }
 
+// Функция создания репозитория
 func NewCourseRepository(db *gorm.DB) *CourseRepository {
 	return &CourseRepository{
 		db: db,
 	}
 }
 
+// Функция получения записи
 func (c CourseRepository) GetCourseByID(id int) (*domain.Course, error) {
 	var course domain.Course
 
@@ -34,6 +37,7 @@ func (c CourseRepository) GetCourseByID(id int) (*domain.Course, error) {
 	return &course, nil
 }
 
+// Функция получения всех записей
 func (c CourseRepository) GetAllCourses() ([]domain.Course, error) {
 	var courses []domain.Course
 
@@ -54,6 +58,7 @@ func (c CourseRepository) GetAllCourses() ([]domain.Course, error) {
 	return courses, nil
 }
 
+// Функция создания записи
 func (c CourseRepository) CreateCourse(course domain.Course) (*domain.Course, error) {
 	tx := c.db.Begin()
 
@@ -75,6 +80,7 @@ func (c CourseRepository) CreateCourse(course domain.Course) (*domain.Course, er
 	return &course, nil
 }
 
+// Функция обновления
 func (c CourseRepository) UpdateCourse(course domain.Course) (*domain.Course, error) {
 	tx := c.db.Begin()
 
@@ -96,10 +102,11 @@ func (c CourseRepository) UpdateCourse(course domain.Course) (*domain.Course, er
 	return &course, nil
 }
 
+// Функция удаления
 func (c CourseRepository) DeleteCourse(id int) error {
 	tx := c.db.Begin()
 
-	if err := tx.Delete(id).Error; err != nil {
+	if err := tx.Where("id = ?", id).Delete(id).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -112,6 +119,7 @@ func (c CourseRepository) DeleteCourse(id int) error {
 	return nil
 }
 
+// Функция получения записи
 func (c CourseRepository) GetCourseByTitle(title string) (*domain.Course, error) {
 	var course domain.Course
 
@@ -130,6 +138,7 @@ func (c CourseRepository) GetCourseByTitle(title string) (*domain.Course, error)
 	return &course, nil
 }
 
+// Функция фильтрации
 func (c CourseRepository) FilterCoursesByTitle(filter string) ([]domain.Course, error) {
 	var courses []domain.Course
 
@@ -148,6 +157,7 @@ func (c CourseRepository) FilterCoursesByTitle(filter string) ([]domain.Course, 
 	return courses, nil
 }
 
+// Функция получения записи
 func (c CourseRepository) GetCourseByUserID(id int) ([]domain.Course, error) {
 	var courses []domain.Course
 
@@ -166,6 +176,7 @@ func (c CourseRepository) GetCourseByUserID(id int) ([]domain.Course, error) {
 	return courses, nil
 }
 
+// Функция сортировки
 func (c CourseRepository) SortCourseByTitle() ([]domain.Course, error) {
 	var courses []domain.Course
 
@@ -184,6 +195,7 @@ func (c CourseRepository) SortCourseByTitle() ([]domain.Course, error) {
 	return courses, nil
 }
 
+// Функция сортировки
 func (c CourseRepository) SortCourseByDate() ([]domain.Course, error) {
 	var courses []domain.Course
 
@@ -202,6 +214,7 @@ func (c CourseRepository) SortCourseByDate() ([]domain.Course, error) {
 	return courses, nil
 }
 
+// Функция сортировки
 func (c CourseRepository) SortCourseByRating() ([]domain.Course, error) {
 	var courses []domain.Course
 
@@ -220,6 +233,7 @@ func (c CourseRepository) SortCourseByRating() ([]domain.Course, error) {
 	return courses, nil
 }
 
+// Функция установки иконки
 func (c CourseRepository) SetCourseIcon(id int, icon string) error {
 	tx := c.db.Begin()
 
@@ -236,6 +250,7 @@ func (c CourseRepository) SetCourseIcon(id int, icon string) error {
 	return nil
 }
 
+// Функция получения записей
 func (c CourseRepository) GetCourseByAuthorID(id int) ([]domain.Course, error) {
 	var courses []domain.Course
 

@@ -5,16 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// Репозиторий для работы с таблицей exercises
 type Exercise struct {
 	db *gorm.DB
 }
 
+// Функция создания репозитория
 func NewExerciseRepository(db *gorm.DB) *Exercise {
 	return &Exercise{
 		db: db,
 	}
 }
 
+// Функция получения записи
 func (e Exercise) GetExerciseByID(id int) (*domain.Exercise, error) {
 	var exercise domain.Exercise
 
@@ -33,6 +36,7 @@ func (e Exercise) GetExerciseByID(id int) (*domain.Exercise, error) {
 	return &exercise, nil
 }
 
+// Функция получения всех записей
 func (e Exercise) GetAllExercises() ([]domain.Exercise, error) {
 	var exercises []domain.Exercise
 
@@ -51,6 +55,7 @@ func (e Exercise) GetAllExercises() ([]domain.Exercise, error) {
 	return exercises, nil
 }
 
+// Функция создания записи
 func (e Exercise) CreateExercise(exercise domain.Exercise) (*domain.Exercise, error) {
 	tx := e.db.Begin()
 
@@ -72,6 +77,7 @@ func (e Exercise) CreateExercise(exercise domain.Exercise) (*domain.Exercise, er
 	return &exercise, nil
 }
 
+// Функция обновления записи
 func (e Exercise) UpdateExercise(exercise domain.Exercise) (*domain.Exercise, error) {
 	tx := e.db.Begin()
 
@@ -93,6 +99,7 @@ func (e Exercise) UpdateExercise(exercise domain.Exercise) (*domain.Exercise, er
 	return &exercise, nil
 }
 
+// Функция удаления
 func (e Exercise) DeleteExercise(id int) error {
 	tx := e.db.Begin()
 
@@ -109,6 +116,7 @@ func (e Exercise) DeleteExercise(id int) error {
 	return nil
 }
 
+// Функция получения записей
 func (e Exercise) GetExercisesByCourseID(id int) ([]domain.Exercise, error) {
 	var exercises []domain.Exercise
 

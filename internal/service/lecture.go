@@ -15,14 +15,17 @@ func NewLectureService(repository repository.Lectures) *LectureService {
 	}
 }
 
+// Функция для получения лекции по ID
 func (l LectureService) GetLectureByID(id int) (*domain.Lecture, error) {
 	return l.repository.GetLectureByID(id)
 }
 
+// Функция для получения всех лекции
 func (l LectureService) GetAllLectures() ([]domain.Lecture, error) {
 	return l.repository.GetAllLectures()
 }
 
+// Функция для создания лекции
 func (l LectureService) CreateLecture(lectureInput CreateLectureInput) (*domain.Lecture, error) {
 	lecture := domain.Lecture{
 		Name:        lectureInput.Name,
@@ -33,6 +36,7 @@ func (l LectureService) CreateLecture(lectureInput CreateLectureInput) (*domain.
 	return l.repository.CreateLecture(lecture)
 }
 
+// Функция для обновления лекции
 func (l LectureService) UpdateLecture(lectureInput UpdateLectureInput) (*domain.Lecture, error) {
 	lecture := domain.Lecture{
 		ID:          lectureInput.ID,

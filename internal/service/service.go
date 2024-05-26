@@ -204,6 +204,7 @@ type Service struct {
 	AuthorRequestsService AuthorRequests
 }
 
+// NewService возвращает новый сервис
 func NewService(
 	repository repository.Repository,
 	config config.Config,

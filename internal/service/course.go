@@ -20,6 +20,7 @@ func NewCourseService(repository repository.Courses, repositoryUser repository.U
 	}
 }
 
+// Функция для получения курса по ID
 func (c CourseService) GetCourseByID(id int) (*domain.Course, error) {
 	course, err := c.repositoryCourse.GetCourseByID(id)
 	if err != nil {
@@ -29,6 +30,7 @@ func (c CourseService) GetCourseByID(id int) (*domain.Course, error) {
 	return course, nil
 }
 
+// Функция для получения всех курсов
 func (c CourseService) GetAllCourses() ([]domain.Course, error) {
 	courses, err := c.repositoryCourse.GetAllCourses()
 	if err != nil {
@@ -38,6 +40,7 @@ func (c CourseService) GetAllCourses() ([]domain.Course, error) {
 	return courses, nil
 }
 
+// Функция для создания курса
 func (c CourseService) CreateCourse(courseInput CreateCourseInput) (*domain.Course, error) {
 	course := domain.Course{
 		Name:        courseInput.Name,

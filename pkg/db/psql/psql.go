@@ -9,6 +9,7 @@ import (
 
 var DB *gorm.DB
 
+// Подключение к БД
 func Connect(dsn string) error {
 	var err error
 
@@ -52,6 +53,7 @@ func Connect(dsn string) error {
 	return nil
 }
 
+// Закрытие соединения
 func Close() {
 	db, err := DB.DB()
 	if err != nil {

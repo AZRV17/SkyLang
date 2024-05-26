@@ -6,16 +6,19 @@ import (
 	"log"
 )
 
+// Репозиторий для работы с таблицей users
 type UserRepository struct {
 	db *gorm.DB
 }
 
+// Функция создания репозитория
 func NewUserRepository(db *gorm.DB) *UserRepository {
 	return &UserRepository{
 		db: db,
 	}
 }
 
+// Функция аутентификации
 func (u UserRepository) SignInByLogin(login, password string) (*domain.User, error) {
 	var user domain.User
 
@@ -38,6 +41,7 @@ func (u UserRepository) SignInByLogin(login, password string) (*domain.User, err
 	return &user, nil
 }
 
+// Функция аутентификации по почте
 func (u UserRepository) SignInByEmail(email, password string) (*domain.User, error) {
 	var user domain.User
 
@@ -60,6 +64,7 @@ func (u UserRepository) SignInByEmail(email, password string) (*domain.User, err
 	return &user, nil
 }
 
+// Функция регистрации
 func (u UserRepository) SignUp(user domain.User) (*domain.User, error) {
 	tx := u.db.Begin()
 
@@ -76,6 +81,7 @@ func (u UserRepository) SignUp(user domain.User) (*domain.User, error) {
 	return &user, nil
 }
 
+// Функция получения пользователя
 func (u UserRepository) GetUserByID(id int) (*domain.User, error) {
 	var user domain.User
 
@@ -96,6 +102,7 @@ func (u UserRepository) GetUserByID(id int) (*domain.User, error) {
 	return &user, nil
 }
 
+// Функция получения всех пользователей
 func (u UserRepository) GetAllUsers() ([]domain.User, error) {
 	var users []domain.User
 
@@ -114,6 +121,7 @@ func (u UserRepository) GetAllUsers() ([]domain.User, error) {
 	return users, nil
 }
 
+// Функция обновления пользователя
 func (u UserRepository) UpdateUser(user domain.User) (*domain.User, error) {
 	tx := u.db.Begin()
 
@@ -130,6 +138,7 @@ func (u UserRepository) UpdateUser(user domain.User) (*domain.User, error) {
 	return &user, nil
 }
 
+// Функция обновления логина и почты
 func (u UserRepository) UpdateUserLoginAndEmail(id int, login, email string) (*domain.User, error) {
 	tx := u.db.Begin()
 
@@ -146,6 +155,7 @@ func (u UserRepository) UpdateUserLoginAndEmail(id int, login, email string) (*d
 	return nil, nil
 }
 
+// Функция удаления
 func (u UserRepository) DeleteUser(id int) error {
 	tx := u.db.Begin()
 
@@ -162,6 +172,7 @@ func (u UserRepository) DeleteUser(id int) error {
 	return nil
 }
 
+// Функция обновления пароля
 func (u UserRepository) UpdatePassword(id int, password string) (*domain.User, error) {
 	tx := u.db.Begin()
 
@@ -185,6 +196,7 @@ func (u UserRepository) UpdatePassword(id int, password string) (*domain.User, e
 	return &user, nil
 }
 
+// Функция обновления курса пользователя
 func (u UserRepository) SignUpForCourse(userID, courseID int) error {
 	tx := u.db.Begin()
 
@@ -201,6 +213,7 @@ func (u UserRepository) SignUpForCourse(userID, courseID int) error {
 	return nil
 }
 
+// Функция обновления пароля по почте
 func (u UserRepository) UpdatePasswordByEmail(email, password string) (*domain.User, error) {
 	tx := u.db.Begin()
 
@@ -224,6 +237,7 @@ func (u UserRepository) UpdatePasswordByEmail(email, password string) (*domain.U
 	return &user, nil
 }
 
+// Функция обновления аватара
 func (u UserRepository) SetUserAvatar(id int, avatar string) (*domain.User, error) {
 	tx := u.db.Begin()
 
@@ -247,6 +261,7 @@ func (u UserRepository) SetUserAvatar(id int, avatar string) (*domain.User, erro
 	return &user, nil
 }
 
+// Функция обновления статуса пользователя
 func (u UserRepository) UpdateUserCourseStatus(userID, courseID int, status string) error {
 	tx := u.db.Begin()
 
@@ -263,6 +278,7 @@ func (u UserRepository) UpdateUserCourseStatus(userID, courseID int, status stri
 	return nil
 }
 
+// Функция добавления пользователя в курс
 func (u UserRepository) CreateUserCourse(userID, courseID int) error {
 	tx := u.db.Begin()
 
@@ -282,6 +298,7 @@ func (u UserRepository) CreateUserCourse(userID, courseID int) error {
 	return nil
 }
 
+// Функция удаления пользователя из курса
 func (u UserRepository) RemoveUserCourse(userID, courseID int) error {
 	tx := u.db.Begin()
 
@@ -298,6 +315,7 @@ func (u UserRepository) RemoveUserCourse(userID, courseID int) error {
 	return nil
 }
 
+// Функция обновления роли пользователя
 func (u UserRepository) UpdateUserRole(userID int, role string) error {
 	tx := u.db.Begin()
 

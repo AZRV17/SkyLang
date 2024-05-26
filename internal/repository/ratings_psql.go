@@ -5,16 +5,19 @@ import (
 	"gorm.io/gorm"
 )
 
+// Репозиторий для работы с таблицей ratings
 type RatingRepository struct {
 	db *gorm.DB
 }
 
+// Функция создания репозитория
 func NewRatingRepository(db *gorm.DB) *RatingRepository {
 	return &RatingRepository{
 		db: db,
 	}
 }
 
+// Функция создания записи
 func (r RatingRepository) CreateRating(rating domain.Rating) (*domain.Rating, error) {
 	tx := r.db.Begin()
 
@@ -31,6 +34,7 @@ func (r RatingRepository) CreateRating(rating domain.Rating) (*domain.Rating, er
 	return &rating, nil
 }
 
+// Функция получения записей
 func (r RatingRepository) GetRatingsByCourseID(id int) ([]domain.Rating, error) {
 	var ratings []domain.Rating
 

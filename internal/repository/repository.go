@@ -90,6 +90,7 @@ type Repository struct {
 	AuthorRequests AuthorRequests
 }
 
+// Функция создания репозитория
 func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		Users:          NewUserRepository(db.Model(domain.User{})),

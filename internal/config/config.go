@@ -42,6 +42,7 @@ type Config struct {
 	}
 }
 
+// NewConfig возвращает конфигурацию приложения
 func NewConfig(configPath string) (*Config, error) {
 	config := &Config{}
 

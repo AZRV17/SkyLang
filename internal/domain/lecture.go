@@ -7,7 +7,7 @@ type Lecture struct {
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 	CourseID    int       `json:"course_id"`
-	Course      *Course   `json:"course" gorm:"foreignKey:CourseID"`
+	Course      *Course   `json:"course" gorm:"foreignKey:CourseID;constraint:OnDelete:CASCADE"`
 	CreatedAt   time.Time `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt   time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
 }
