@@ -1,8 +1,10 @@
 package service
 
 import (
+	"encoding/base64"
 	"github.com/AZRV17/Skylang/internal/domain"
 	"github.com/AZRV17/Skylang/internal/repository"
+	"io/ioutil"
 	"log"
 )
 
@@ -26,6 +28,14 @@ func (c CourseService) GetCourseByID(id int) (*domain.Course, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	image := course.Icon
+
+	fileImage, _ := ioutil.ReadFile(image)
+
+	imageToBase64 := base64.StdEncoding.EncodeToString(fileImage)
+
+	course.Icon = imageToBase64
 
 	return course, nil
 }
@@ -63,6 +73,7 @@ func (c CourseService) UpdateCourse(courseInput UpdateCourseInput) (*domain.Cour
 		AuthorID:    courseInput.Author,
 		Lectures:    courseInput.Lectures,
 		Exercises:   courseInput.Exercises,
+		Rating:      int(courseInput.Grate),
 	}
 
 	return c.repositoryCourse.UpdateCourse(course)

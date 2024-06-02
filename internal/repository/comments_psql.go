@@ -42,7 +42,7 @@ func (c CommentRepository) GetAllComments() ([]domain.Comment, error) {
 
 	tx := c.db.Begin()
 
-	if err := tx.Find(&comments).Error; err != nil {
+	if err := tx.Preload("Author").Find(&comments).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}

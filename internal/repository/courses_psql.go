@@ -24,7 +24,7 @@ func (c CourseRepository) GetCourseByID(id int) (*domain.Course, error) {
 
 	tx := c.db.Begin()
 
-	if err := tx.First(&course, "id = ?", id).Error; err != nil {
+	if err := tx.Preload("Author").First(&course, "id = ?", id).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}

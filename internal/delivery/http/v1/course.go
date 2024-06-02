@@ -23,18 +23,34 @@ func (h *Handler) initCourseRoutes(r *gin.Engine) {
 	}
 }
 
+type createCourseInput struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Language    string `json:"language"`
+	Icon        string `json:"icon"`
+	Author      int    `json:"author"`
+}
+
 func (h *Handler) createCourse(c *gin.Context) {
-	var input service.CreateCourseInput
+	var input createCourseInput
 	if err := c.BindJSON(&input); err != nil {
+		log.Println(input)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	log.Println(input)
 
 	icon := input.Icon
 
 	input.Icon = ""
 
-	course, err := h.service.CourseService.CreateCourse(input)
+	course, err := h.service.CourseService.CreateCourse(service.CreateCourseInput{
+		Name:        input.Name,
+		Description: input.Description,
+		Language:    input.Language,
+		Icon:        icon,
+		Author:      input.Author,
+	})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

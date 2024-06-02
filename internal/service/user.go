@@ -1,9 +1,11 @@
 package service
 
 import (
+	"encoding/base64"
 	"github.com/AZRV17/Skylang/internal/domain"
 	"github.com/AZRV17/Skylang/internal/repository"
 	"golang.org/x/crypto/bcrypt"
+	"io/ioutil"
 	"log"
 	"math/rand"
 )
@@ -64,7 +66,19 @@ func (u UserService) SignUp(userInput CreateUserInput) (*domain.User, error) {
 }
 
 func (u UserService) GetUserByID(id int) (*domain.User, error) {
-	return u.repository.GetUserByID(id)
+	user, err := u.repository.GetUserByID(id)
+	if err != nil {
+		return nil, err
+	}
+
+	image := user.Avatar
+
+	fileImage, _ := ioutil.ReadFile(image)
+
+	imageToBase64 := base64.StdEncoding.EncodeToString(fileImage)
+
+	user.Avatar = imageToBase64
+	return user, nil
 }
 
 func (u UserService) GetAllUsers() ([]domain.User, error) {

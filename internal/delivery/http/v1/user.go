@@ -108,6 +108,7 @@ type SignUpInput struct {
 	Password string `json:"password"`
 	Email    string `json:"email" binding:"required,email"`
 	Role     string `json:"role"`
+	Avatar   string `json:"avatar"`
 }
 
 func (h *Handler) signUp(c *gin.Context) {
@@ -119,10 +120,24 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
-	user, err := h.service.UserService.SignUp(service.CreateUserInput(input))
+	user, err := h.service.UserService.SignUp(service.CreateUserInput{
+		Login:    input.Login,
+		Password: input.Password,
+		Email:    input.Email,
+		Role:     input.Role,
+	})
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	if input.Avatar != "" {
+		log.Println(input.Avatar)
+		err = h.service.ImageService.SetUserAvatar(user.ID, input.Avatar)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, user)
