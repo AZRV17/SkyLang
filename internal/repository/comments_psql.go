@@ -76,7 +76,7 @@ func (c CommentRepository) CreateComment(comment domain.Comment) (*domain.Commen
 func (c CommentRepository) UpdateComment(comment domain.Comment) (*domain.Comment, error) {
 	tx := c.db.Begin()
 
-	if err := tx.Save(&comment).Error; err != nil {
+	if err := tx.Where("id = ?", comment.ID).Save(&comment).Error; err != nil {
 		tx.Rollback()
 		return nil, err
 	}
