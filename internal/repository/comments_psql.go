@@ -93,7 +93,7 @@ func (c CommentRepository) UpdateComment(comment domain.Comment) (*domain.Commen
 func (c CommentRepository) DeleteComment(id int) error {
 	tx := c.db.Begin()
 
-	if err := tx.Delete(id).Error; err != nil {
+	if err := tx.Where("id = ?", id).Delete(id).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
