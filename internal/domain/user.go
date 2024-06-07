@@ -12,7 +12,7 @@ type User struct {
 	Email     string       `json:"email"`
 	Role      string       `json:"role"`
 	Avatar    string       `json:"avatar,omitempty" gorm:"null"`
-	Courses   []UserCourse `json:"courses"`
+	Courses   []UserCourse `json:"courses" gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE"`
 	CreatedAt time.Time    `json:"createdAt" gorm:"autoCreateTime"`
 	UpdatedAt time.Time    `json:"updatedAt" gorm:"autoUpdateTime"`
 }
