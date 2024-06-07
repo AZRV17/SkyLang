@@ -86,11 +86,16 @@ func (u UserService) GetAllUsers() ([]domain.User, error) {
 }
 
 func (u UserService) UpdateUser(userInput UpdateUserInput) (*domain.User, error) {
+	hashedPass, err := bcrypt.GenerateFromPassword([]byte(userInput.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
 	user := domain.User{
 		ID:       userInput.ID,
 		Login:    userInput.Login,
 		Avatar:   userInput.Avatar,
-		Password: userInput.Password,
+		Password: string(hashedPass),
 		Email:    userInput.Email,
 		Role:     userInput.Role,
 	}
